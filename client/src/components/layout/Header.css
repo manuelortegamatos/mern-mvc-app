@@ -1,0 +1,63 @@
+/* client/src/components/layout/Header.css */
+
+
+.header {
+    background-color: #ffffff; /* Fondo blanco limpio */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil para darle elevación */
+    padding: 15px 0;
+    position: sticky; /* Fija el encabezado al hacer scroll */
+    top: 0;
+    z-index: 1000;
+}
+
+.header .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between; /* Espacia el logo, la navegación y el botón */
+    align-items: center;
+}
+
+/* --- LOGO --- */
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333; /* Color oscuro profesional */
+    text-decoration: none;
+}
+
+/* --- NAVEGACIÓN --- */
+.nav ul {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+    margin: 0;
+    padding: 0;
+}
+
+.nav a {
+    text-decoration: none;
+    color: #555; /* Texto gris para la navegación */
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav a:hover {
+    color: #007bff; /* Color de acento al pasar el ratón */
+}
+
+/* --- BOTÓN CTA --- */
+.cta-button {
+    background-color: #ff4500; /* Naranja/Rojo llamativo (el color de acento) */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+    background-color: #cc3700; /* Un poco más oscuro al pasar el ratón */
+}
