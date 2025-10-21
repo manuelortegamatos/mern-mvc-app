@@ -111,4 +111,81 @@ git rm -r --cached node_modules
 git rm --cached server/.env
 git rm --cached client/.env
 
+git config --global user.name "Emmanuel Ortega"
+git config --global user.email "tu-email@example.com"
+
+git remote add origin https://github.com/tu-usuario/mern-mvc-app.git
+git branch -M main
+git push -u origin main
+
+git clone https://github.com/tu-usuario/mern-mvc-app.git
+cd mern-mvc-app
+npm install          # instalar dependencias del server y client
+npm run dev          # levantar client y server
+
+
+git add .
+git commit -m "Mensaje del commit"
+git push
+
+https://github.com/manuelortegamatos/mern-mvc-app.git
+
+…or create a new repository on the command line
+echo "# mern-mvc-app" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/manuelortegamatos/mern-mvc-app.git
+git push -u origin main
+…or push an existing repository from the command line
+git remote add origin https://github.com/manuelortegamatos/mern-mvc-app.git
+git branch -M main
+git push -u origin main
+
+//git hub again after the last one
+
+1. Connect Your Local Repository to the Remote
+You must first tell your local Git where the remote repository (your "backup" on GitHub, GitLab, etc.) is located.
+
+Bash
+
+git remote add origin <REMOTE_URL>
+git remote add: Establishes the connection.
+
+origin: The standard nickname for your main remote repository.
+
+<REMOTE_URL>: The URL you got from the hosting service after you created the empty repository remotely (e.g., https://github.com/your-username/your-project.git).
+
+2. Push and Set Up Tracking
+After connecting, you run the push command, which transfers your local commits and sets a permanent link between your local and remote branches.
+
+Bash
+
+git push -u origin main
+git push: Executes the action of sending your local commits to the remote.
+
+-u (or --set-upstream): This is the crucial part. It tells Git to:
+
+Create the main branch on the remote server (origin).
+
+Set your local main branch to track the remote one.
+
+Pushing Subsequent Progress
+After you run the command above successfully, every future push of new progress from that same branch is efficient and simple:
+
+Make changes and commit them:
+
+Bash
+
+git add .
+git commit -m "Description of new progress"
+Push to the remote:
+
+Bash
+
+git push
+Git will remember the connection you established in step 2, and git push will automatically know where to send your updates.
+
+
 

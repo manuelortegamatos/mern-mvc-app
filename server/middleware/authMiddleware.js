@@ -1,3 +1,59 @@
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
+
+const protect = async (req, res, next ) => {
+
+    let token;
+
+    // Check if the token exists in the headers
+
+    if(
+        req.headers.authorization && 
+        req.headers.authorization.startsWith('Bearer')
+    ){
+        try{
+           // Extract the token ( remove "bearer")
+           token = req.headers.authorization.split(' ')[1];
+
+           // verify the token using the secret key
+           const decoded= jwt.verify(token, process.env.JWT_SECRET);
+
+           //Fetch the user associated with the token and attach it to the request
+           req.user = await User.findById(decoded.id).select('-password');
+
+           // if this user doesn't exist (e.g it was removed)
+
+           if(!req.user){
+                return res.status(401).json({message: 'Not authorized, user not found'});
+           }
+
+           next(); // move to the next middleware or the controller function
+
+        }catch(error) {
+            console.error('error verification process: ',error);
+            //using return to finalize the program
+            return res.status(401).json({message: 'Not authorized, token failed or expired '} );
+        }
+    }
+
+    if(!token){
+        return res.status(401).json({ message: 'Not authorized, no token'});
+    }
+};
+
+const admin = async (req,res,next )=>{
+
+    if(req.user && req.user.role ==='admin'){
+        next(); // permitir acceso
+    } else{
+
+        //denegra el acceso con un codigo de estado 403 forbidden
+        res.status(403).json({message: 'Not authroized as an admin'});
+    }
+};
+
+export { protect, admin };
+/*
 // server/middleware/authMiddleware.js
 const jwt = require('jsonwebtoken');
 const User = require('../models/User'); // Necesitamos el modelo User
@@ -50,3 +106,5 @@ exports.admin = (req, res, next) => {
 //     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 // };
 // Y luego en loginUser: const token = generateToken(user._id);
+
+*/

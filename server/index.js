@@ -1,13 +1,21 @@
 import express from "express";
 import connectDB from "./config/db.js";
 import dotenv from "dotenv";
+import userRoutes from "./routes/userRoutes.js";
+
 
 dotenv.config();
 connectDB();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+//middleware: usar json para el cuerpo de las peticiones
+app.use(express.json());
 
+//middleware: usar las rutas de usuario
+//todas las rutas dentro de userRoutes.js se montaran bajo /api/users
+app.use('/api/users',userRoutes);
+
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 

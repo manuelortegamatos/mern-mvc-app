@@ -1,7 +1,7 @@
 // server/models/User.js
 
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const UserSchema = new mongoose.Schema({
     // --- Campos de Nombre y Apellido ---
@@ -23,6 +23,9 @@ const UserSchema = new mongoose.Schema({
     // --- Email (opcional, como habíamos definido) ---
     email: {
         type: String,
+        required: false,
+        unique:true,
+        sparse:true, //Allows multiple documents to have a null email
         lowercase: true,
         // unique: true, // Lo manejaremos en el controlador si se proporciona
         // No es requerido
@@ -31,6 +34,14 @@ const UserSchema = new mongoose.Schema({
     password: {
         type: String,
         // No es requerido. Puede ser null.
+        required: function (){
+            //"this" refers to the document being validated/saved
+            //if this.email has a value, password is required (returns true)
+            //if this.email. is null/undefined, password is NOT required (returns false)
+            return !!this.email;
+        },
+        minlength: 6,
+
     },
     // --- Otros campos (iguales) ---
     phone: {
@@ -64,11 +75,18 @@ const UserSchema = new mongoose.Schema({
 // Middleware de Mongoose para hashear la contraseña ANTES de guardar
 UserSchema.pre('save', async function(next) {
     // Solo hashea si la contraseña ha sido modificada Y SI SU VALOR NO ES NULO/UNDEFINED
-    if (this.isModified('password') && this.password) {
+    if (!this.isModified('password') || !this.password) {
+        return next();
+    }
+    try{
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
+        return next();
     }
-    next();
+    catch(error){
+        next(error); // pass any hashing error to Mongoose
+    }
+
 });
 
 // Método para comparar contraseñas
@@ -79,4 +97,4 @@ UserSchema.methods.matchPassword = async function(enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = mongoose.model('User', UserSchema);
+export default mongoose.model('User', UserSchema);

@@ -1,10 +1,10 @@
 // server/controllers/userController.js
+import generateToken from '../utils/generateToken.js';
+import User from '../models/User.js';
+import transporter from '../config/emailConfig.js';
+import crypto from 'crypto';
 
-const User = require('../models/User');
-const transporter = require('../config/emailConfig');
-const crypto = require('crypto');
-
-exports.registerUser = async (req, res) => {
+const registerUser = async (req, res) => {
     // Ahora esperamos firstName y lastName
     const { firstName, lastName, email, phone, address } = req.body;
 
@@ -70,7 +70,8 @@ exports.registerUser = async (req, res) => {
         await newUser.save();
 
         // 5. Enviar correo electrónico si se generó una contraseña
-        if (mailSent = (tempPassword && userEmail)) { // Asigna y evalúa al mismo tiempo
+        mailSent =!! (tempPassword && userEmail)
+        if (mailSent) { 
             const mailOptions = {
                 from: process.env.EMAIL_USER,
                 to: userEmail,
@@ -121,8 +122,7 @@ exports.registerUser = async (req, res) => {
 
 // @desc    Auth user & get token (Login por Email y Contraseña)
 // @route   POST /api/users/login
-// @access  Public
-exports.loginUser = async (req, res) => {
+const loginUser = async (req, res) => {
     // Para login, ahora se podría usar `email` o `userName`
     // Aquí asumimos que el frontend enviará 'email' y 'password'.
     // Si quieres login por 'userName', necesitarás otro endpoint o una lógica para determinarlo.
@@ -131,10 +131,14 @@ exports.loginUser = async (req, res) => {
     if (!email || !password) {
         return res.status(400).json({ message: 'Please enter email and password' });
     }
+    const identifier= email.toLowerCase();
+    const potentialUsername = identifier.split('@')[0];
 
     try {
-        const userEmail = email.toLowerCase();
-        const user = await User.findOne({ email: userEmail });
+        
+        const user = await User.findOne({ 
+            $or: [{ email: identifier }, {userName: potentialUsername } ]  
+        });
 
         if (!user) {
             return res.status(400).json({ message: 'Invalid credentials' });
@@ -148,8 +152,9 @@ exports.loginUser = async (req, res) => {
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
-
-        const token = "GENERAR_JWT_AQUI";
+        // ahora usamos la funcion
+        
+        const token =generateToken(user._id); // generate token using the user's ID
 
         res.json({
             message: 'Logged in successfully',
@@ -170,4 +175,103 @@ exports.loginUser = async (req, res) => {
     }
 };
 
+const getUserProfile = async (req, res) =>{
+
+   // cuando el middleware protect se ejecuta adjunta el objeto user a la peticion res.user
+   if(req.user){
+    // Enviar los datos del usuario adjuntos por el middleware
+        res.json({
+            _id: req.user._id,
+            firstName: req.user.firstName,
+            email: req.user.email,
+            role: req.user.role,
+            //NO  incluir la contraseña
+
+        });
+
+   }else {
+        // esto solo ocurriria si el middleware protect falla, pero es una buena practica
+        res.status(401).json ({message: 'user not found'});
+
+   }
+};
+
 // ... otros controladores
+
+const adminTest=(req,res) =>{
+//si la solicitud llega aqui el usuario es admin
+    res.status(200).json({
+        message: 'Welcome Admin! this is a restricted area',
+        user: req.user.firstName
+    });
+};
+
+// --- Controlador para que un Admin cree un Usuario ---
+// @desc    Admin creates a new user (employee, admin, client)
+// @route   POST /api/users/create
+// @access  Private/Admin
+
+const createUser = async (req, res) => {
+    // 💡 Aquí el admin puede establecer el rol (role)
+    const { firstName, lastName, email, phone, password, role, address } = req.body; 
+
+    // 1. Validaciones básicas
+    if (!firstName || !email || !phone || !password) {
+        return res.status(400).json({ message: 'Please include firstName, email, phone, and password' });
+    }
+
+    try {
+        // 2. Verificar duplicados (teléfono y email)
+        const userExistsPhone = await User.findOne({ phone });
+        if (userExistsPhone) {
+            return res.status(400).json({ message: 'User with this phone number already exists' });
+        }
+        const userExistsEmail = await User.findOne({ email: email.toLowerCase() });
+        if (userExistsEmail) {
+            return res.status(400).json({ message: 'User with this email already exists' });
+        }
+
+        // 3. Generar userName a partir del email (o dejarlo opcional)
+        const emailParts = email.split('@');
+        const generatedUserName = emailParts.length > 0 ? emailParts[0] : null;
+
+        // 4. Crear el nuevo usuario (la contraseña se hashea automáticamente en el modelo)
+        const newUser = await User.create({
+            firstName,
+            lastName,
+            userName: generatedUserName,
+            email: email.toLowerCase(),
+            password, // La contraseña se hashea en el pre-save hook del modelo
+            phone,
+            address,
+            // 💡 Permite al admin establecer el rol (por defecto 'client' si no se envía)
+            role: role || 'client' 
+        });
+
+        res.status(201).json({
+            message: `User ${newUser.email} created successfully with role ${newUser.role}.`,
+            user: {
+                _id: newUser._id,
+                firstName: newUser.firstName,
+                email: newUser.email,
+                role: newUser.role
+            }
+        });
+
+    } catch (error) {
+        console.error(error);
+        // Manejar errores de unicidad de MongoDB o errores del servidor
+        if (error.code === 11000) {
+            return res.status(400).json({ message: 'A user with this email or username already exists.' });
+        }
+        res.status(500).json({ message: 'Server error during user creation', error: error.message });
+    }
+};
+
+export {
+     registerUser,
+     loginUser,
+     getUserProfile, // exporta la nueva funcion
+     adminTest,
+     createUser,
+};
