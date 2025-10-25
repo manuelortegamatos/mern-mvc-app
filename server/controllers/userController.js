@@ -75,16 +75,16 @@ const registerUser = async (req, res) => {
             const mailOptions = {
                 from: process.env.EMAIL_USER,
                 to: userEmail,
-                subject: '¡Bienvenido a nuestro servicio de limpieza!',
+                subject: '"Welcome to our cleaning service!"',
                 html: `
-                    <p>Hola ${firstName},</p>
-                    <p>Gracias por registrarte en nuestro servicio de limpieza.</p>
-                    <p>Tus credenciales para iniciar sesión son:</p>
-                    <p><strong>Usuario (Email):</strong> ${userEmail}</p>
-                    <p><strong>Usuario (Nombre de Usuario):</strong> ${generatedUserName}</p>
-                    <p><strong>Contraseña Temporal:</strong> ${tempPassword}</p>
-                    <p>Por favor, inicia sesión y considera cambiar tu contraseña por una más segura.</p>
-                    <p>¡Esperamos verte pronto!</p>
+                    <p>Hi ${firstName},</p>
+                    <p>Thank you for registering for our cleaning service.</p>
+                    <p>Your credentials for logging in are:</p>
+                    <p><strong>User (Email):</strong> ${userEmail}</p>
+                    <p><strong>UserName :</strong> ${generatedUserName}</p>
+                    <p><strong>Temporary Password:</strong> ${tempPassword}</p>
+                    <p>Please log in and consider changing your password to a more secure one.</p>
+                    <p>We hope to see you soon!</p>
                 `
             };
             await transporter.sendMail(mailOptions);
@@ -275,3 +275,4 @@ export {
      adminTest,
      createUser,
 };
+

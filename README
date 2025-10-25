@@ -185,7 +185,29 @@ Push to the remote:
 Bash
 
 git push
+
 Git will remember the connection you established in step 2, and git push will automatically know where to send your updates.
 
 
+Action	Command to Use
+Check the existing URL	git remote -v
+Change the existing URL	git remote set-url origin <NEW_REMOTE_URL>
+Remove and re-add	git remote remove origin followed by git remote add origin <REMOTE_URL>
 
+The Conventional Commit Format
+To achieve maximum clarity and consistency, use the format <type>: <subject>
+
+Type	When to Use It	Example
+feat	A new feature for the user.	feat: Add dark mode toggle
+fix	A bug fix.	fix: Resolve infinite redirect loop on login
+refactor	Code restructuring without changing behavior.	refactor: Extract form validation logic
+docs	Changes to documentation only.	docs: Update README with installation guide
+style	Formatting, missing semicolons, etc. (no code change).	style: Add trailing commas to array literals
+test	Adding or correcting tests.	test: Add unit tests for utility functions
+chore	Routine tasks (config, build process, etc.).	chore: Upgrade webpack to latest version
+
+next way for git pushing for now on
+
+PS C:\Projects\mern-mvc-app> git add .
+PS C:\Projects\mern-mvc-app> git commit -m ""
+PS C:\Projects\mern-mvc-app> git push
