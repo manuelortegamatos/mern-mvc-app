@@ -7,8 +7,13 @@ import dotenv from 'dotenv';
 dotenv.config({ path: '../.env' }); 
 
 const transporter = nodemailer.createTransport({
-
-    //example: using a service like Gmail
+  /* 
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    secure: false, 
+    requireTLS: true,
+*/
+    // using a service like Gmail
 
     service: process.env.MAIL_SERVICE || 'gmail',
     auth: {
@@ -16,7 +21,7 @@ const transporter = nodemailer.createTransport({
         //use environment variable sfor sensitve data
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
-    },
+    }
 
 });
 

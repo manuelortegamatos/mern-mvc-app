@@ -1,15 +1,15 @@
 // server/routes/serviceRequestRoutes.js
 
-const express = require('express');
-const {
+import express from 'express';
+import {
     createServiceRequest,
     getMyServiceRequests,
     getAllServiceRequests,
     getServiceRequestById,
     updateServiceRequest,
     deleteServiceRequest
-} = require('../controllers/serviceRequestController');
-const { protect, admin } = require('../middleware/authMiddleware'); // Importa los middlewares
+}from '../controllers/serviceRequestController.js';
+import { protect, admin } from '../middleware/authMiddleware'; // Importa los middlewares
 
 const router = express.Router();
 

@@ -1,6 +1,8 @@
 import express from 'express';
-const router = express.Router();
 import {protect,admin} from '../middleware/authMiddleware.js';
+
+
+const router = express.Router();
 
 // 💡 Nota: Aquí es donde importarías tu controlador (controller) de usuarios
 // const userController = require('../controllers/userController');

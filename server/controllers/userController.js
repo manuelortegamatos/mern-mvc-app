@@ -3,6 +3,12 @@ import generateToken from '../utils/generateToken.js';
 import User from '../models/User.js';
 import transporter from '../config/emailConfig.js';
 import crypto from 'crypto';
+import {sendSms, sendBatchSms } from '../services/smsService.js';
+/*
+import {gateways, normalizeCarrier} from '../config/carrierGateways.js';
+import {detectCarrier } from '../middleware/carrierMiddleware.js';
+import {delay } from '../utils/delay.js';
+*/
 
 const registerUser = async (req, res) => {
     // Ahora esperamos firstName y lastName
@@ -268,11 +274,78 @@ const createUser = async (req, res) => {
     }
 };
 
+// 2. Define the controller method for a single sms 
+
+const sendSingleSms = async (req, res) => {
+    // Input validation is crucial in a controller
+
+    const {phoneNumber, message } = req.body;
+
+    if (!phoneNumber || ! message ){
+        return res.status(400).json({ error:"Both phoneNumber and message are required" });
+    }
+
+    try {
+
+        // call your core business logic function 
+
+        await sendSms(phoneNumber, message );
+
+        // send a successful resopnse back to the client 
+
+        res.status(200).json({
+            success: true,
+            message: `SMS successfully queued for ${phoneNumber}.`
+
+        });
+    }catch (error){
+        res.status(500).json({
+            success: false,
+            message: "Failed to send SMS.",
+            details: error.message
+        });
+    }
+
+};
+
+//Define the controller method for a batch SMS
+
+const sendBulkSms = async (req, res) => {
+    const { phoneNumbers, message } = req.body; // expect an array of numbers
+
+    if (!Array.isArray(phoneNumbers)|| ! message || phoneNumbers.length ===0){
+        return res.status(400).json({ error: "An array of phone numbers and message are required "});
+    }
+
+    try{
+
+        //call your batch function 
+
+        //note: sendBatcsms handles its own internal error logging per number
+        await sendBatchSms(phoneNumbers,message);
+
+        res.status(200).json({
+            success: true,
+            message: `Batch SMS process initiated for ${phoneNumbers.length} recipients.`
+        });
+    } catch (error) {
+        // this catch block will only hit if sendBatchSms throws an unexpected error,
+        // as its logic usually handles internal errors.
+        console.error("Batch SMS process failed", error);
+        res.status(500).json({
+            success: false,
+            message: "batch SMS process failed unexpectedly."
+        });
+    }
+};
+
 export {
      registerUser,
      loginUser,
-     getUserProfile, // exporta la nueva funcion
+     getUserProfile, 
      adminTest,
      createUser,
+     sendSingleSms,
+     sendBulkSms
 };
 

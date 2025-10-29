@@ -86,7 +86,7 @@ npm install jsonwebtoken.
 npm install dotenv
 
 //more effiencte server side
-npm install nodemon mongoose bcryptjs jsonwebtoken dotenv
+npm install nodemon mongoose bcryptjs jsonwebtoken dotenv node-fetch google-libphonenumber
 
 //client side
 npm install react-router-dom react-dom axios react-scripts@latest
